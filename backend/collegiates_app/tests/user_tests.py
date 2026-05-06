@@ -70,13 +70,11 @@ class UserEventRegistrationTests(APITestCase):
     # good :D
     def test_register_single_event(self):
         response = self.client.post(self.URL, data=[{"event": "AMA102"}], format='json')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
     def test_register_multiple_events(self):
         response = self.client.post(self.URL, data=[{"event": "AMA102"}, {"event": "AMA121"}], format='json')
-        print(response.data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)        
 
 class GroupsetCreationTests(APITestCase):
     """
@@ -111,6 +109,6 @@ class GroupsetCreationTests(APITestCase):
         self.client.post(self.create_URL, data={'team_name': 'Big Bruin Club'}, format='multipart')
         groupset = Groupset.objects.get(team_name='Big Bruin Club').groupset_id
         self.user = _make_competitor(email="competitor1@example.com", password="StrongPass123!", school=College.objects.get(college_name="UC Los Angeles"))
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user) # type: ignore
         response = self.client.post(self.join_URL, data={'groupset': groupset}, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 
 
-from ..models import Blog, College
+from ..models import Blog, College, User
 from ..serializers import CollegeSerializer, BlogSerializer
 
 @ensure_csrf_cookie
@@ -21,6 +21,14 @@ def college_data(request):
     colleges = College.objects.all().order_by("college_name")
     serializer = CollegeSerializer(colleges, many=True)
     return Response(serializer.data)
+
+# CHECK DB FOR COMPETITOR ACCOUNT ASSOCIATED WITH EMAIL
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_email(request):
+    email = request.query_params.get('email', '')
+    exists = User.objects.filter(email__iexact=email).filter(user_type='competitor').exists()
+    return Response({'exists': exists})
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

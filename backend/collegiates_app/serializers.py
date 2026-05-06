@@ -105,11 +105,6 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
 # serializer for displaying competitor information on frontend
 class CompetitorSerializer(serializers.ModelSerializer):
     school = CollegeSerializer()
-    registration = EventRegistrationSerializer(
-        source='*',
-        many=True,
-        read_only=True
-    )
 
     class Meta:
         model = User

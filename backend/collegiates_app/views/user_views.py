@@ -148,38 +148,13 @@ class RegisterEvents(generics.ListCreateAPIView):
         if isinstance(config, Response):
             return config
         return super().get(request, *args, **kwargs)    
-    
-# REGISTER COMPETITORS FOR EVENTS
-# @api_view(['POST'])
-# @permission_classes([IsCompetitor])
-# def register_events(request):
-#     config = Settings.load()
-#     if config is None:
-#         return Response({"detail": "No settings have been created yet."},
-#                 status=status.HTTP_404_NOT_FOUND
-#         )
-#     serializer = WriteEventRegistrationSerializer(data=request.data, many=True, context={'request': request})
-#     if not serializer.is_valid():
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-#     events = [item['event'] for item in serializer.validated_data] # type: ignore
-#     year = config.reg_year
-    
-#     event_rows = [Registration(competitor=request.user, comp_year=year, event=event) for event in events]
-#     Registration.objects.bulk_create(event_rows)
-
-#     return Response(
-#         {"detail": f"Successfully registered for {len(event_rows)} event(s)."},
-#         status=status.HTTP_201_CREATED
-#   )
 
 # GET COMPETITOR INFO
 @api_view(['GET'])
 @permission_classes([IsCompetitor])
 def my_profile(request):
     uid = request.user.user_id
-    user = User.objects.select_related('school').get(user_id=uid)
+    user = User.objects.get(user_id=uid)
     serializer = CompetitorSerializer(user)
     return Response(serializer.data)
 
