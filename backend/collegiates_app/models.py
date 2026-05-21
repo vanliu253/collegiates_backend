@@ -113,11 +113,13 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
+    @property
     def is_organizer(self):
-        return self.user_type == 'C'
-    
-    def is_competitor(self):
         return self.user_type == 'O'
+    
+    @property
+    def is_competitor(self):
+        return self.user_type == 'C'
     
     class Meta:
         db_table = 'users'

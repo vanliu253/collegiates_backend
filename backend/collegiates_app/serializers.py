@@ -69,7 +69,6 @@ class CollegeSerializer(serializers.ModelSerializer):
         model = College
         fields = '__all__'
 
-
 class BlogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Blog
@@ -93,13 +92,15 @@ class EventRegistrationListSerializer(serializers.ListSerializer):
         return data
     
 class EventRegistrationSerializer(serializers.ModelSerializer):
-    event = EventSerializer()
-
+    event = EventSerializer(read_only=True)
+    event_code = serializers.CharField(write_only=True)
+    
     class Meta:
         model = Registration
         fields = ['comp_year', 
                   'date_created',
                   'event',
+                  'event_code',
                   'nandu_str']
         list_serializer_class = EventRegistrationListSerializer
         read_only_fields = ['comp_year', 'date_created']
@@ -118,23 +119,30 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
         if config is None:
             raise serializers.ValidationError({'event': 'Competition settings have not been set'})
         
+        event = Event.objects.get(event_code=data['event_code'])
+
         user_gender = self.context['request'].user.gender
-        event_gender = data['event'].gender_category
-        if event_gender != user_gender:
+        
+        if event.gender_category != user_gender:
             raise serializers.ValidationError({'event': "Competitor signed up for wrong gender category"})
         
         user_level = self.context['request'].user.skill_level
-        event_level = data['event'].event_level
-        if event_level != user_level:
+        
+        if event.event_level != user_level:
             raise serializers.ValidationError({'event': "Competitor signed up for wrong level"})
 
-        if not Event.objects.filter(event_code=data['event'].event_code).exists():
-            raise serializers.ValidationError({'event': f"Event with id {data['event']} does not exist."})
+        if not Event.objects.filter(event_code=event.event_code).exists():
+            raise serializers.ValidationError({'event': f"Event with id {event} does not exist."})
         
-        if Registration.objects.filter(competitor=self.context['request'].user, event=data['event'], comp_year=config.reg_year).exists(): # type: ignore
+        if Registration.objects.filter(competitor=self.context['request'].user, event=event, comp_year=config.reg_year).exists(): # type: ignore
             raise serializers.ValidationError({'event': "You are already registered for this event."})
         
+        data['event'] = event
         return data
+
+    def create(self, validated_data):
+        validated_data.pop('event_code', None)
+        return super().create(validated_data)
 
 class RegistrationSerializer(serializers.ModelSerializer):
     event = EventSerializer(read_only=True)
@@ -159,7 +167,9 @@ class CompetitorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['user_id', 
+        fields = ['user_id',
+                  'first_name',
+                  'last_name', 
                   'email', 
                   'gender', 
                   'school', 
@@ -167,7 +177,8 @@ class CompetitorSerializer(serializers.ModelSerializer):
                   'first_comp', 
                   'skill_level', 
                   'grad_date', 
-                  'registrations']
+                  'registrations',
+                  'user_type']
         
     def get_registrations(self, obj):
         registrations = obj.registration_set.all()
@@ -213,20 +224,25 @@ class GroupsetMemberSerializer(serializers.ModelSerializer):
         return data
     
 # Serializers for organizer tournament settings
-class ReadSettingsSerializer(serializers.ModelSerializer):
-    host = CollegeSerializer()
+class SettingsSerializer(serializers.ModelSerializer):
+    host = serializers.SlugRelatedField(queryset=College.objects.all(), 
+                                        slug_field='college_name')
 
     class Meta:
         model = Settings
-        fields = "__all__"
-        read_only_fields = ["created_at"]
-
-class WriteSettingsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Settings
-        exclude = ["created_at"]
+        fields = ['reg_year', 
+                  'early_reg_start', 
+                  'early_reg_end', 
+                  'reg_start', 
+                  'reg_end',
+                  'comp_date',
+                  'contact_email',
+                  'host',
+                  'created_at']
+        read_only = ['created_at']
 
     def validate(self, data):
+        # need to implement: dates cannot be before or after current comp year
         if data['early_reg_start'] > data['early_reg_end']:
             return serializers.ValidationError("Early registration start must come after early registration ends")
         if data['early_reg_end'] > data['reg_start']:

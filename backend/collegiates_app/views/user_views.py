@@ -47,7 +47,6 @@ class RegisterEvents(generics.ListCreateAPIView):
     serializer_class = EventRegistrationSerializer
     permission_classes = [IsCompetitor]
     
-
     def get_serializer(self, *args, **kwargs):
         kwargs['many'] = True
         return super().get_serializer(*args, **kwargs)
