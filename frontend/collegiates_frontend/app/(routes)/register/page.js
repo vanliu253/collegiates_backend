@@ -1,15 +1,14 @@
 "use client";
 
 import { AuthPanel } from "@/app/components/authPanel";
-import { Button, LongButton } from "@/app/components/button";
+import { LongButton } from "@/app/components/button";
 import {
   DatePicker,
   Dropdown,
   ShortAnswer,
 } from "@/app/components/formComponents";
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Ewert } from "next/font/google";
+
 
 export default function Register() {
   // choices mirror the enums defined in models.py
@@ -171,58 +170,83 @@ export default function Register() {
   const SIGNUP_URL = "http://localhost:8000/collegiates_app/signup/";
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const requiredFields = ["first_comp", "grad_date", "skill_level", "school", "gender", "student_type"];
+  const requiredFields = ["first_comp", "grad_date", "skill_level", "school", "gender", "student_type"];
 
-    const allErrors = {};
-    requiredFields.forEach((name) => {
-      const error = validate(name, formData[name]);
-      if (error) allErrors[name] = error;
+  const allErrors = {};
+  requiredFields.forEach((name) => {
+    const error = validate(name, formData[name]);
+    if (error) allErrors[name] = error;
+  });
+
+  if (Object.keys(allErrors).length > 0) {
+    setErrors(allErrors);
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // Prepare JSON payload
+    const payload = {
+      ...formData,
+      grad_date: formData.grad_date ? `${formData.grad_date}-01` : ""
+    };
+
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    
+    if (csrfToken) {
+      headers["X-CSRFToken"] = csrfToken;
+    }
+
+    const resp = await fetch(SIGNUP_URL, {
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+      headers: headers,
+      body: JSON.stringify(payload),
     });
 
-    if (Object.keys(allErrors).length > 0) {
-      setErrors(allErrors);
-      return;
+    let data;
+    try { 
+      data = await resp.json(); 
+    } catch { 
+      data = null; 
     }
 
-    try {
-      const payload = new FormData();
-      Object.entries(formData).forEach(([k, v]) => {
-        if (k === "grad_date" && v) v = v + "-01"; 
-        payload.append(k, v || "");
-      });
-      const headers = {};
-      if (csrfToken) {
-        headers["X-CSRFToken"] = csrfToken;
+    if (!resp.ok) {
+      console.log("Status:", resp.status);
+      console.log("Full error response:", JSON.stringify(data, null, 2));
+      
+      // Handle field-specific errors from DRF serializer
+      if (data && data.errors) {
+        // Transform DRF error format to match your state structure
+        const transformedErrors = {};
+        Object.entries(data.errors).forEach(([field, messages]) => {
+          // DRF returns arrays of error messages, take the first one
+          transformedErrors[field] = Array.isArray(messages) ? messages[0] : messages;
+        });
+        setErrors(transformedErrors);
       }
-
-      const resp = await fetch(SIGNUP_URL, {
-        method: "POST",
-        mode: "cors",
-        credentials: "include",
-        headers: headers,
-        body: payload,
-      });
-
-      let data;
-      try { data = await resp.json(); } catch { data = null; }
-
-      if (!resp.ok) {
-        console.log("Status:", resp.status);
-        console.log("Full error response:", JSON.stringify(data, null, 2)); // add this
-        setError((data && data.error) || "Registration failed");
-      } else {
-        console.log("registered", data);
-        // TODO redirect to signin or show success
-      }
-    } catch (err) {
-      setError("Network error");
-      console.error(err);
-    } finally {
-      setLoading(false);
+      
+      setError(data?.errors ? "Please fix the errors below" : "Registration failed");
+    } else {
+      console.log("Registration successful", data);
+      // Success! data.success === true and data.user_id is available
+      // TODO: redirect to signin or dashboard
+      // Example: router.push('/signin');
+      // Or show success message
     }
-  };
+  } catch (err) {
+    setError("Network error. Please try again.");
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handlePageChange = (e) => {
     if (!nextPage) {
@@ -241,16 +265,8 @@ export default function Register() {
     setNextPage(!nextPage);
   };
 
-  // function onDateChange(timestamp) {
-  //   console.log(timestamp);
-  // }
-
   return (
     <>
-      {/* <div
-        id="bg-component"
-        className="bg-secondary h-screen w-full skew-y-6 absolute -top-[50svh] left-0 -z-20"
-      ></div> */}
       {!nextPage ? (
         <AuthPanel
           bottomLabel="Already registered? "

@@ -1,20 +1,32 @@
-from django.urls import path
+from django.urls import path, include, re_path
+from rest_framework.routers import DefaultRouter
 
-from . import views
+from .views import *
+
+router = DefaultRouter()
+router.register(r'blog', BlogView, basename='blog')
 
 urlpatterns = [
-    path("csrf/", views.get_csrf_token, name="get_csrf_token"),
-    path("college_data/", views.college_data, name="college_data"),
-    path("blog_data/", views.blog_paginated, name="blog_data"),
-    path("signup/", views.signup, name="signup"),
-    path("signin/", views.signin, name="signin"),
-    path("signout/", views.signout, name="signout"),
-    path("reset-password/", views.reset_password_link, name="reset_password"),
-    path("reset-password-confirm/", views.reset_password_confirm, name="reset_password_confirm"),
-    path('check-email/', views.check_email, name="check_email"),
-    path('profile/', views.Competitor.as_view(), name="my_profile"),
-    path('registration/', views.RegisterEvents.as_view(), name="registration"),
-    path('events/', views.GetEvents.as_view(), name="get_events"),
-    path('groupset/', views.CreateGroupset.as_view(), name="groupset"),
-    path('groupset-members/', views.JoinGroupset.as_view(), name="groupset_members")
+    # re_path(r'^auth/', include('djoser.urls')),
+    # re_path(r'^auth/', include('djoser.urls.jwt')),
+    path("csrf/", get_csrf_token, name="get_csrf_token"),
+    path("college_data/", college_data, name="college_data"),
+    path("signup/", signup, name="signup"),
+    path("signin/", signin, name="signin"),
+    path("signout/", signout, name="signout"),
+    # path("reset-password/", reset_password_link, name="reset_password"),
+    # path("reset-password-confirm/", reset_password_confirm, name="reset_password_confirm"),
+    path('check-email/', check_email, name="check_email"),
+    path('profile/', CompetitorView.as_view(), name="my_profile"),
+    path('registration/', RegistrationView.as_view(), name="registration"),
+    path('events/', EventsView.as_view(), name="get_events"),
+    path('groupset/', CreateGroupsetView.as_view(), name="groupset"),
+    path('groupset-members/', JoinGroupsetView.as_view(), name="groupset_members"),
+    path('settings/', SettingsView.as_view({'get': 'retrieve', 
+                                                   'post': 'create',
+                                                   'patch': 'update'}), 
+                                                   name="competition_settings"),
+    path('', include(router.urls))
 ]
+
+

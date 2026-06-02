@@ -10,9 +10,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from ..permissions import IsCompetitor
+from ..permissions import IsCompetitor, IsOrganizer, IsAuthenticated
 from ..models import User
-from ..serializers import RegisterCompetitorSerializer
+from ..serializers import RegisterCompetitorSerializer, RegisterOrganizerSerializer
 
 # SIGN INTO COMPETITOR ACCOUNT
 @api_view(['POST'])
@@ -33,7 +33,7 @@ def signin(request):
 
 # SIGN OUT OF COMPETITOR ACCOUNT
 @api_view(['POST'])
-@permission_classes([IsCompetitor])
+@permission_classes([IsAuthenticated])
 def signout(request):   
     logout(request)
     return Response({'success': True})

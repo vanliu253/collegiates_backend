@@ -118,23 +118,21 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
         config = Settings.load()
         if config is None:
             raise serializers.ValidationError({'event': 'Competition settings have not been set'})
-        
-        event = Event.objects.get(event_code=data['event_code'])
+        # if registration is not active, return error
 
-        user_gender = self.context['request'].user.gender
+        user = self.context['request'].user
+        event = Event.objects.filter(event_code=data['event_code']).first()
+
+        if event is None:
+            raise serializers.ValidationError({'event': f"Event with id {data['event_code']} does not exist."})
         
-        if event.gender_category != user_gender:
+        if event.gender_category != user.gender:
             raise serializers.ValidationError({'event': "Competitor signed up for wrong gender category"})
         
-        user_level = self.context['request'].user.skill_level
-        
-        if event.event_level != user_level:
+        if event.event_level != user.level:
             raise serializers.ValidationError({'event': "Competitor signed up for wrong level"})
-
-        if not Event.objects.filter(event_code=event.event_code).exists():
-            raise serializers.ValidationError({'event': f"Event with id {event} does not exist."})
         
-        if Registration.objects.filter(competitor=self.context['request'].user, event=event, comp_year=config.reg_year).exists(): # type: ignore
+        if Registration.objects.filter(competitor=user, event=event, comp_year=config.reg_year).exists(): 
             raise serializers.ValidationError({'event': "You are already registered for this event."})
         
         data['event'] = event
@@ -200,7 +198,7 @@ class GroupsetSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         config = Settings.load()
-        if GroupsetMember.objects.filter(member=self.context['request'].user).exists():
+        if GroupsetMember.objects.filter(member=self.context['request'].user, groupset__comp_year=config.reg_year).exists():
             raise serializers.ValidationError({'groupset': 'You are already in a groupset'})
         if Groupset.objects.filter(team_name=data['team_name'], comp_year=config.reg_year).exists():
             raise serializers.ValidationError({'groupset': 'A groupset with this name already exists'})
@@ -210,17 +208,24 @@ class GroupsetMemberSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = GroupsetMember
-        fields = ['groupset']
+        fields = ['groupset', 'member', 'leader']
         read_only_fields = ['member', 'leader']
 
     def validate(self, data):
+        config = Settings.load()
         groupset = Groupset.objects.filter(groupset_id=data['groupset'].groupset_id).first()
         if groupset is None:
             raise serializers.ValidationError({'groupset': 'Groupset does not exist'})
-        if GroupsetMember.objects.filter(groupset=groupset.groupset_id, member=self.context['request'].user).exists():
-            raise serializers.ValidationError({'groupset': 'You are already registered with this groupset'})
+        if groupset.comp_year != config.reg_year:
+            raise serializers.ValidationError({'groupset': 'Groupset is not in current registration year'})
         if self.context['request'].user.school != groupset.school:
             raise serializers.ValidationError({'groupset': 'You must sign up for a groupset from your school'})
+        if GroupsetMember.objects.filter(groupset=groupset.groupset_id, member=self.context['request'].user).exists():
+            raise serializers.ValidationError({'groupset': 'You are already registered with this groupset'})
+        if GroupsetMember.objects.filter(member=self.context['request'].user, groupset__comp_year=config.reg_year).exists():
+            raise serializers.ValidationError({'groupset': 'You are already in a groupset'})
+        if GroupsetMember.objects.filter(groupset=groupset.groupset_id).count() == 6:
+            raise serializers.ValidationError({'groupset': 'Groupset is full'})
         return data
     
 # Serializers for organizer tournament settings
