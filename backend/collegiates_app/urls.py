@@ -7,13 +7,13 @@ router = DefaultRouter()
 router.register(r'blog', BlogView, basename='blog')
 
 urlpatterns = [
-    # re_path(r'^auth/', include('djoser.urls')),
-    # re_path(r'^auth/', include('djoser.urls.jwt')),
+    re_path(r'^auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.jwt')),
+    path("auth/signup/", signup, name="signup"),
+    path("auth/signin/", signin, name="signin"),
+    path("auth/signout/", signout, name="signout"),
     path("csrf/", get_csrf_token, name="get_csrf_token"),
     path("college_data/", college_data, name="college_data"),
-    path("signup/", signup, name="signup"),
-    path("signin/", signin, name="signin"),
-    path("signout/", signout, name="signout"),
     # path("reset-password/", reset_password_link, name="reset_password"),
     # path("reset-password-confirm/", reset_password_confirm, name="reset_password_confirm"),
     path('check-email/', check_email, name="check_email"),

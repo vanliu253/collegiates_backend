@@ -176,7 +176,7 @@ class CompetitorSerializer(serializers.ModelSerializer):
                   'skill_level', 
                   'grad_date', 
                   'registrations',
-                  'user_type']
+                  'user_type'] # TESTING ONLY, REMOVE FOR PRODUCTION
         
     def get_registrations(self, obj):
         registrations = obj.registration_set.all()

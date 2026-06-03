@@ -107,7 +107,7 @@ class User(AbstractUser):
     
     username = None
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS: list[str] = []
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'gender', 'school', 'student_type', 'first_comp', 'skill_level', 'grad_date']
 
     objects = CustomUserManager()
 
