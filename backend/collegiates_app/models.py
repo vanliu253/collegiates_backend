@@ -8,7 +8,6 @@ class GenderChoices(models.TextChoices):
     MALE = 'M', 'Male'
     FEMALE = 'F', 'Female'
 
-
 class StudentStatusChoices(models.TextChoices):
     UNDERGRADUATE = "1", "Full/Part-Time Undergraduate" 
     FT_GRADUATE = "2", "Full-Time Graduate/Professional School"

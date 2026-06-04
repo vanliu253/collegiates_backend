@@ -32,7 +32,7 @@ class RegisterCompetitorSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         password = validated_data.pop('password1')
-        user = User(user_type='competitor', **validated_data)
+        user = User(user_type='C', **validated_data)
         user.set_password(password)
         user.save()
         return user
