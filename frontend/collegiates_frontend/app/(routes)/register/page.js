@@ -40,13 +40,13 @@ export default function Register() {
         if (!value) return "Email is required";
         if (!/\S+@\S+\.\S+/.test(value)) return "Invalid email address";
         return "";
-      case "password1":
+      case "password":
         if (!value) return "Password is required";
         if (value.length < 8) return "Password must be at least 8 characters";
         return "";
-      case "password2":
+      case "re_password":
         if (!value) return "Please confirm your password";
-        if (value != formData.password1) return "Passwords do not match";
+        if (value != formData.password) return "Passwords do not match";
         return "";
       case "first_name":
         if (!value) return "Required";
@@ -167,7 +167,7 @@ export default function Register() {
     init();
   }, []);
 
-  const SIGNUP_URL = "http://localhost:8000/collegiates_app/signup/";
+  const SIGNUP_URL = "http://localhost:8000/collegiates_app/auth/users/";
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -250,7 +250,7 @@ export default function Register() {
 
   const handlePageChange = (e) => {
     if (!nextPage) {
-      const requiredFields = ["email", "password1", "password2", "first_name", "last_name"]
+      const requiredFields = ["email", "password", "re_password", "first_name", "last_name"]
       const allErrors = {};
       requiredFields.forEach((name) => {
         const error = validate(name, formData[name]);
@@ -289,27 +289,27 @@ export default function Register() {
           )}
           <ShortAnswer
             type="password"
-            name="password1"
+            name="password"
             label="Password*"
             minLength={8}
             onChange={handleChange}
-            value={formData.password1 || ""}
+            value={formData.password || ""}
             required
           />
-          {errors.password1 && (
-            <p className="text-red-500 text-sm -mt-2">{errors.password1}</p>
+          {errors.password && (
+            <p className="text-red-500 text-sm -mt-2">{errors.password}</p>
           )}
           <ShortAnswer
             type="password"
-            name="password2"
+            name="re_password"
             label="Confirm Password*"
             minLength={8}
             onChange={handleChange}
-            value={formData.password2 || ""}
+            value={formData.re_password || ""}
             required
           />
-          {errors.password2 && (
-            <p className="text-red-500 text-sm -mt-2">{errors.password2}</p>
+          {errors.re_password && (
+            <p className="text-red-500 text-sm -mt-2">{errors.re_password}</p>
           )}
           <div className="flex gap-4">
             <div className="flex flex-col flex-1">
