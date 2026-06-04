@@ -32,7 +32,7 @@ class RegisterCompetitorSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password2')
         password = validated_data.pop('password1')
-        user = User(user_type='competitor', **validated_data)
+        user = User(user_type='C', **validated_data)
         user.set_password(password)
         user.save()
         return user
@@ -176,7 +176,7 @@ class CompetitorSerializer(serializers.ModelSerializer):
                   'skill_level', 
                   'grad_date', 
                   'registrations',
-                  'user_type']
+                  'user_type'] # TESTING ONLY, REMOVE FOR PRODUCTION
         
     def get_registrations(self, obj):
         registrations = obj.registration_set.all()

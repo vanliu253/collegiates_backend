@@ -82,7 +82,7 @@ export default function Register() {
   const checkEmailExists = async (email) => {
     if (!email || !/\S+@\S+\.\S+/.test(email)) return;
     try {
-      const res = await fetch(`http://localhost:8000/collegiates_app/check_email/?email=${encodeURIComponent(email)}`, {
+      const res = await fetch(`http://localhost:8000/collegiates_app/check-email/?email=${encodeURIComponent(email)}`, {
         mode: "cors",
         credentials: "include",
       });
@@ -134,7 +134,7 @@ export default function Register() {
     const init = async () => {
       // hit the CSRF endpoint so Django sets the csrftoken cookie
       try {
-        await fetch("http://localhost:8000/csrf/", {
+        await fetch("http://localhost:8000/collegiates_app/csrf/", {
           mode: "cors",
           credentials: "include",
         });
