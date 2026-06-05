@@ -24,7 +24,9 @@ services:
     depends_on:
       - db
   django-web:
-    build: .
+    build:
+      context: .
+      dockerfile: dockerfile
     container_name: django-docker
     ports:
      - "8000:8000"

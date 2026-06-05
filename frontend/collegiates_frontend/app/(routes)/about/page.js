@@ -3,7 +3,7 @@ import { CWCReps } from "@/app/components/cwcReps";
 export default function About() {
   return (
     <>
-      <div className="flex-col  bg-primary text-off-white">
+      <div className="flex-col bg-primary text-off-white py-10">
         <div className="content-center w-full max-w-8/10 translate-x-1/10">
           <div>&nbsp;</div>
           <header className="flex items-center text-6xl animate-fadeIn">ABOUT</header>
@@ -28,7 +28,7 @@ export default function About() {
           <div>&nbsp;</div>
         </div>
       </div>
-      <div className="flex-col  bg-off-white text-primary">
+      <div className="flex-col  bg-off-white text-primary py-10">
         <div className="content-center w-full max-w-8/10 translate-x-1/10">
           <div>&nbsp;</div>
           <header className="flex items-center text-6xl animate-fadeIn">CWCMembers</header>
@@ -53,7 +53,7 @@ export default function About() {
           <div>&nbsp;</div>
         </div>
       </div>
-      <div className="flex-col  bg-primary text-off-white">
+      <div className="flex-col  bg-primary text-off-white py-10">
         <div className="content-center w-full max-w-8/10 translate-x-1/10">
           <div>&nbsp;</div>
           <header className="flex items-center text-6xl animate-fadeIn">Previous Hosts</header>
