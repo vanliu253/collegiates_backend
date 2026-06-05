@@ -164,7 +164,7 @@ export default function Register() {
     init();
   }, []);
 
-  const SIGNUP_URL = "http://localhost:8000/collegiates_app/auth/users/";
+  const SIGNUP_URL = "http://localhost:8000/collegiates_app/auth/signup/";
 
   const handleSubmit = async (e) => {
   e.preventDefault();

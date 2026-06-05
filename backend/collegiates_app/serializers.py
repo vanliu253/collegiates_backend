@@ -11,20 +11,20 @@ class RegisterCompetitorSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["email",
-                  "password1",
-                  "password2",
+                  "password",
+                  "re_password",
                   "school"
                   ]
     
     def validate(self, data):
-        if data['password1'] != data['password2']:
-            raise serializers.ValidationError({'password2': 'Passwords do not match'})
+        if data['re_password'] != data['password']:
+            raise serializers.ValidationError({'re_password': 'Passwords do not match'})
         return data
     
     # called automatically on save()
     def create(self, validated_data):
-        validated_data.pop('password2')
-        password = validated_data.pop('password1')
+        validated_data.pop('re_password')
+        password = validated_data.pop('password')
         email = validated_data.pop('email')
         user = User.objects.create_user(email=email, password=password, **validated_data) # type: ignore
         return user
