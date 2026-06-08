@@ -2,15 +2,13 @@
 
 import { AuthPanelWide } from "@/app/components/authPanel";
 import { LongButton } from "@/app/components/button";
-import { MtHeader } from "@/app/layouts/headers";
 import {
   DatePicker,
   Dropdown,
   ShortAnswer,
 } from "@/app/components/formComponents";
 import { useEffect, useState } from "react";
-import { UserLayout } from "@/app/layouts/user";
-import { NavBar } from "@/app/components/navbar";
+import { UserLayout } from "@/app/layouts/layouts";
 
 
 export default function Signup() {
@@ -251,7 +249,7 @@ export default function Signup() {
 
 
   return (
-    <UserLayout navBar={<NavBar/>} header={<MtHeader/>}>
+    <UserLayout>
       <div
         id="bg-component"
         className="bg-primary h-screen w-full skew-y-10 absolute -top-[60svh] left-0 -z-20"

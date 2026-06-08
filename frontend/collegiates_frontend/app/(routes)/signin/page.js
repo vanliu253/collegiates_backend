@@ -4,9 +4,7 @@ import { AuthPanel } from "@/app/components/authPanel";
 import { Button } from "@/app/components/button";
 import { ShortAnswer } from "@/app/components/formComponents";
 import { useEffect, useState } from "react";
-import { MtHeader } from "@/app/layouts/headers";
-import { UserLayout } from "@/app/layouts/user";
-import { NavBar } from "@/app/components/navbar";
+import { UserLayout } from "@/app/layouts/layouts";
 
 export default function SignIn() {
   
@@ -156,7 +154,7 @@ export default function SignIn() {
   };
 
   return (
-    <UserLayout navBar={<NavBar/>} header={<MtHeader/>}>
+    <UserLayout>
       <div
         id="bg-component"
         className="bg-secondary h-screen w-full skew-y-6 absolute -top-[50svh] left-0 -z-20"
