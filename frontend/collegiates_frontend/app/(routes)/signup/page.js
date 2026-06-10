@@ -168,6 +168,8 @@ export default function Signup() {
         .then((res)=>{
           console.log("Registration successful");
           setError("");
+          router.push('/signin'); 
+
       })
         .catch((err)=>{
           console.log("Status:", err.status);
@@ -187,7 +189,6 @@ export default function Signup() {
           setError(err.response?.data? "Please fix the errors below" : "Registration failed");
         });
     setLoading(false);
-    router.push('/signin'); 
   };
 
   useCsrf();
