@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { UserLayout } from "@/app/layouts/layouts";
 import axios from "@/axios/axios";
 import useCsrf from "@/hooks/useCsrf";
+import { useRouter } from "next/navigation";
 
 
 export default function Signup() {
@@ -26,6 +27,8 @@ export default function Signup() {
     "Part-Time Graduate Student": "6",
     "International Student": "7",
   };
+
+  const router = useRouter();
 
   const [colleges, setColleges] = useState({});
   const [formData, setFormData] = useState({});
@@ -163,7 +166,7 @@ export default function Signup() {
         credentials: "include",
       })
         .then((res)=>{
-          console.log("Registration successful", data);
+          console.log("Registration successful");
           setError("");
       })
         .catch((err)=>{
@@ -184,7 +187,7 @@ export default function Signup() {
           setError(err.response?.data? "Please fix the errors below" : "Registration failed");
         });
     setLoading(false);
-
+    router.push('/signin'); 
   };
 
   useCsrf();

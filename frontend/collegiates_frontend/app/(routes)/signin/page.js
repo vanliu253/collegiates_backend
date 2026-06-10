@@ -7,6 +7,8 @@ import { useState } from "react";
 import { UserLayout } from "@/app/layouts/layouts";
 import axios from "@/axios/axios";
 import useCsrf from "@/hooks/useCsrf";
+import { setJwt } from "@/lib/slices/jwt";
+import { useAppDispatch} from "@/lib/hooks";
 
 export default function SignIn() {
   
@@ -14,6 +16,8 @@ export default function SignIn() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const dispatch = useAppDispatch();
 
 
   const validate = (name, value) => {
@@ -65,12 +69,14 @@ export default function SignIn() {
         credentials: "include",
       })
         .then((res)=>{
-          console.log("Registration successful", res.data);
+          console.log(res.data);
+          dispatch(setJwt(res.data.access));
+          console.log("Sign In succsessful")
           setError("");
-      })
-        .catch((err)=>{
-          setError(err.response?.data?.detail? err.response.data.detail : "Sign In failed");
-        });
+      });
+        // .catch((err)=>{
+        //   setError(err.response?.data?.detail? err.response.data.detail : "Sign In failed");
+        // });
     setLoading(false);
   };
 
