@@ -1,9 +1,11 @@
+import { Provider } from "react-redux";
 import { NavBar } from "../components/navbar";
 import { MtHeader } from "./headers";
+import store from "../store";
 
 function UserLayout({ header = <MtHeader/>, children }) {
     return (
-        <>
+        <Provider store={store}>
             <div
                 id="bg-component"
                 className="bg-tertiary fixed h-screen w-full absolute -top-[0svh] left-0 -z-20"
@@ -19,7 +21,7 @@ function UserLayout({ header = <MtHeader/>, children }) {
 
                 <div>{children}</div>
             </div>
-        </>
+        </Provider>
     );
 }
 
