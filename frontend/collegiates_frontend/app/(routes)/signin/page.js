@@ -7,8 +7,10 @@ import { useState } from "react";
 import { UserLayout } from "@/app/layouts/layouts";
 import axios from "@/axios/axios";
 import useCsrf from "@/hooks/useCsrf";
+import useRefreshToken from "@/hooks/useRefreshToken";
 import { setJwt } from "@/lib/slices/jwt";
 import { useAppDispatch} from "@/lib/hooks";
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   
@@ -18,6 +20,7 @@ export default function SignIn() {
   const [error, setError] = useState("");
 
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
 
   const validate = (name, value) => {
@@ -65,22 +68,25 @@ export default function SignIn() {
 
     axios
         .post("/auth/jwt/create/", payload, {
-        mode: "cors",
-        credentials: "include",
-      })
+          mode: "cors",
+          withCredentials: true,
+          credentials: "include",
+        })
         .then((res)=>{
           console.log(res.data);
           dispatch(setJwt(res.data.access));
           console.log("Sign In succsessful")
           setError("");
-      });
-        // .catch((err)=>{
-        //   setError(err.response?.data?.detail? err.response.data.detail : "Sign In failed");
-        // });
+          router.push('/dashboard');
+        })
+        .catch((err)=>{
+          setError(err.response?.data?.detail? err.response.data.detail : "Sign In failed");
+        });
     setLoading(false);
   };
 
   useCsrf();
+  useRefreshToken();
 
   return (
     <UserLayout>

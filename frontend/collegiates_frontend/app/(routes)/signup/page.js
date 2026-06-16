@@ -12,6 +12,8 @@ import { UserLayout } from "@/app/layouts/layouts";
 import axios from "@/axios/axios";
 import useCsrf from "@/hooks/useCsrf";
 import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/lib/hooks";
+import { setSuccessMsg } from "@/lib/slices/success";
 
 
 export default function Signup() {
@@ -35,6 +37,8 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const dispatch = useAppDispatch();
 
   const validate = (name, value) => {
     switch(name) {
@@ -116,6 +120,8 @@ export default function Signup() {
     if (name === "email") checkEmailExists(value);
   };
 
+  useCsrf();
+
   useEffect(() => {
     const init = async () => {
       axios
@@ -163,11 +169,13 @@ export default function Signup() {
     axios
         .post("/auth/users/", payload, {
         mode: "cors",
+        withCredentials: true,
         credentials: "include",
       })
         .then((res)=>{
-          console.log("Registration successful");
+          // console.log("Registration successful");
           setError("");
+          dispatch(setSuccessMsg("Account created successfully"));
           router.push('/signin'); 
 
       })
@@ -191,7 +199,6 @@ export default function Signup() {
     setLoading(false);
   };
 
-  useCsrf();
 
   return (
     <UserLayout>
