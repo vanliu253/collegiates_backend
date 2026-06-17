@@ -28,7 +28,7 @@ function useCurrentUser(){
 
     getMe();
 
-  },[]);
+  },[access]);
 
   return userInfo;
 }

@@ -8,13 +8,13 @@ import {
   ShortAnswer,
 } from "@/app/components/formComponents";
 import { useState } from "react";
-import { UserLayout } from "@/app/layouts/layouts";
 import axios from "@/axios/axios";
 import { useCsrf, useColleges} from "@/hooks/publicApiHooks";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/hooks";
 import { setSuccessMsg } from "@/lib/slices/success";
 import { validate, handleFormBlur, handleFormChange } from "@/app/handlers/forms";
+import { MtHeader } from "@/app/components/headers";
 
 
 export default function Signup() {
@@ -79,7 +79,7 @@ export default function Signup() {
 
     const allErrors = {};
     requiredFields.forEach((name) => {
-      const error = validate(name, formData[name]);
+      const error = validate(name, formData[name], formData);
       if (error) allErrors[name] = error;
     });
 
@@ -131,7 +131,8 @@ export default function Signup() {
 
 
   return (
-    <UserLayout>
+    <>
+      <MtHeader/>
       <div
         id="bg-component"
         className="bg-primary h-screen w-full skew-y-10 absolute -top-[60svh] left-0 -z-20"
@@ -315,6 +316,6 @@ export default function Signup() {
             </button>
           </AuthPanelWide>
       }
-    </UserLayout>
+    </>
   );
 }

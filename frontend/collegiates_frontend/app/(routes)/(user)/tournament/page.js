@@ -1,6 +1,5 @@
 "use client"
 
-import { UserLayout } from "@/app/layouts/layouts";
 import { useState } from "react";
 
 export default function Tournament() {
@@ -19,7 +18,7 @@ export default function Tournament() {
   const [compData, SetCompData] = useState(placeholderDate);
 
   return (
-    <UserLayout header={null}>
+    <>
       <div className="relative overflow-hidden">
         <img src="test_img_1.png" className="w-full opacity-70"/>
 
@@ -101,6 +100,6 @@ export default function Tournament() {
           of enrollment or graduation will be the date used for determining eligibility.<br/>
         </div>
       </div>
-    </UserLayout>
+    </>
   );
 }
