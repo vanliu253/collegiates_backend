@@ -1,15 +1,16 @@
 "use client"
 
 import { Button } from "@/app/components/button";
-import { UserLayout } from "@/app/layouts/layouts"
 import { useCurrentUser } from "@/hooks/userApiHooks"
+import { MtHeader } from "@/app/components/headers";
 
 export default function Dashboard (){
     
     const userinfo = useCurrentUser();
     
     return (        
-        <UserLayout>
+        <>
+            <MtHeader/>
             <div className="bg-off-white grid grid-cols-3 rounded-lg px-[10%]">
                 <div className="flex-row text-4xl p-1">
                     {userinfo.first_name} {userinfo.last_name}
@@ -31,6 +32,6 @@ export default function Dashboard (){
                     user type: {userinfo.user_type}
                 </div>
             </div>
-        </UserLayout>
+        </>
     )
 }

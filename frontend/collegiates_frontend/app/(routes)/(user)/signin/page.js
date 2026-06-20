@@ -3,7 +3,6 @@
 import { AuthPanel } from "@/app/components/authPanel";
 import { ShortAnswer } from "@/app/components/formComponents";
 import { useState } from "react";
-import { UserLayout } from "@/app/layouts/layouts";
 import axios from "@/axios/axios";
 import { useCsrf } from "@/hooks/publicApiHooks";
 import useRefreshToken from "@/hooks/useRefreshToken";
@@ -12,6 +11,7 @@ import { useAppDispatch} from "@/lib/hooks";
 import { useRouter } from "next/navigation";
 import { validate, handleFormBlur, handleFormChange } from "@/app/handlers/forms";
 import { setSuccessMsg } from "@/lib/slices/success";
+import { MtHeader } from "@/app/components/headers";
 
 export default function SignIn() {
   
@@ -74,7 +74,8 @@ export default function SignIn() {
   useRefreshToken();
 
   return (
-    <UserLayout>
+    <>
+      <MtHeader/>
       <div
         id="bg-component"
         className="bg-secondary h-screen w-full skew-y-6 absolute -top-[50svh] left-0 -z-20"
@@ -117,6 +118,6 @@ export default function SignIn() {
           </div>
         </div>
       </AuthPanel>
-    </UserLayout>
+    </>
   );
 }

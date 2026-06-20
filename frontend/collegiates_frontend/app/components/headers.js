@@ -1,5 +1,3 @@
-import { NavBar } from "../components/navbar";
-
 function ImgHeader() {
     return (
         
@@ -14,5 +12,6 @@ function MtHeader(){
         <div className="min-h-24 max-h-24"></div>
     )
 }
+
 
 export { ImgHeader, MtHeader };

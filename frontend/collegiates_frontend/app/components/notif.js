@@ -1,3 +1,5 @@
+"use client"
+
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearSuccessMsg } from "@/lib/slices/success";
 import { clearErrorMsg } from "@/lib/slices/error";
