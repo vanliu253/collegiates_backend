@@ -1,14 +1,17 @@
 "use client";
 
 import { AuthPanel } from "@/app/components/authPanel";
-import { Button } from "@/app/components/button";
 import { ShortAnswer } from "@/app/components/formComponents";
 import { useState } from "react";
-import { UserLayout } from "@/app/layouts/layouts";
 import axios from "@/axios/axios";
-import useCsrf from "@/hooks/useCsrf";
+import { useCsrf } from "@/hooks/publicApiHooks";
+import useRefreshToken from "@/hooks/useRefreshToken";
 import { setJwt } from "@/lib/slices/jwt";
 import { useAppDispatch} from "@/lib/hooks";
+import { useRouter } from "next/navigation";
+import { validate, handleFormBlur, handleFormChange } from "@/app/handlers/forms";
+import { setSuccessMsg } from "@/lib/slices/success";
+import { MtHeader } from "@/app/components/headers";
 
 export default function SignIn() {
   
@@ -18,27 +21,12 @@ export default function SignIn() {
   const [error, setError] = useState("");
 
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
+  const handleChange = handleFormChange(setFormData, setErrors);
 
-  const validate = (name, value) => {
-    if (!(name == "email")) return "";
-    if (!value) return "Email is required";
-    if (!/\S+@\S+\.\S+/.test(value)) return "Invalid email address";
-    return "";
-  }
+  const handleBlur = handleFormBlur(setErrors);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: validate(name, value),
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,25 +53,29 @@ export default function SignIn() {
 
     axios
         .post("/auth/jwt/create/", payload, {
-        mode: "cors",
-        credentials: "include",
-      })
+          mode: "cors",
+          withCredentials: true,
+          credentials: "include",
+        })
         .then((res)=>{
           console.log(res.data);
           dispatch(setJwt(res.data.access));
-          console.log("Sign In succsessful")
           setError("");
-      });
-        // .catch((err)=>{
-        //   setError(err.response?.data?.detail? err.response.data.detail : "Sign In failed");
-        // });
+          dispatch(setSuccessMsg("Sign In Succsessful"))
+          router.push('/dashboard');
+        })
+        .catch((err)=>{
+          setError(err.response?.data?.detail? err.response.data.detail : "Sign In failed");
+        });
     setLoading(false);
   };
 
   useCsrf();
+  useRefreshToken();
 
   return (
-    <UserLayout>
+    <>
+      <MtHeader/>
       <div
         id="bg-component"
         className="bg-secondary h-screen w-full skew-y-6 absolute -top-[50svh] left-0 -z-20"
@@ -100,9 +92,11 @@ export default function SignIn() {
           name="email"
           label="Email*"
           onChange={handleChange}
+          onBlur={handleBlur}
           value={formData.email || ""}
           required
         />
+        {errors.email && <div className="text-red-500 mb-4">Invalid email address</div>}
         <ShortAnswer
           type="password"
           name="password"
@@ -118,12 +112,12 @@ export default function SignIn() {
               onClick={handleSubmit}
               type="submit"
               disabled={loading}
-              className="self-stretch mb-20">
-              <Button>{loading ? "Signing in..." : "Sign In"}</Button>
+              className="btn btn-primary">
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </div>
         </div>
       </AuthPanel>
-    </UserLayout>
+    </>
   );
 }
