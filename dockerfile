@@ -48,5 +48,5 @@ USER appuser
 EXPOSE $PORT 
 
 # Start the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "--workers", "3", "django_backend.wsgi:application"]
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 3 django_backend.wsgi:application
 # CMD python manage.py runserver 0.0.0.0:$PORT
