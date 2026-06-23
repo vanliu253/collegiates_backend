@@ -65,7 +65,7 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'collegiate_app.authentication.CookieJWTAuthentication'
+        'collegiates_app.authentication.CookieJWTAuthentication'
         'rest_framework.authentication.SessionAuthentication'
     ],
     'DEFAULT_RENDERER_CLASSES': [
