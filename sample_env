@@ -2,11 +2,13 @@
 DJANGO_DATABASE_NAME=
 DJANGO_DATABASE_USER=
 DJANGO_DATABASE_PWORD=
-DJANGO_DATABASE_HOST=db
-DJANGO_DATABASE_PORT=5432
-DJANGO_SECRET=2vh5mcx9$&q-4qe%jnv!a%vry+t0-@l%wcy@%*mse0)*xl_2w=
-DJANGO_ALLOWED_HOSTS=localhost
+DJANGO_DATABASE_HOST=
+DJANGO_DATABASE_PORT=
+DJANGO_SECRET=
+DJANGO_ALLOWED_HOSTS=localhost,collegiate-wushu.onrender.com
 DJANGO_LOGLEVEL=info
 DJANGO_DATABASE_ENGINE=postgresql_psycopg2
+DJANGO_CORS_ALLOWED_ORIGINS=http://localhost:8000,http://localhost:3000,https://collegiate-wushu.onrender.com
+DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://localhost:3000,https://collegiate-wushu.onrender.com
 DEBUG=True
 PORT=8000

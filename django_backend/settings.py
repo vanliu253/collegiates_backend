@@ -181,18 +181,18 @@ CORS_ALLOW_CREDENTIALS = True
 #     }
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": 'django.db.backends.{}'.format(
-             os.getenv('DJANGO_DATABASE_ENGINE')
-        ),
-        "NAME": os.getenv('DJANGO_DATABASE_NAME'),
-        "USER": os.getenv('DJANGO_DATABASE_USER'),
-        "PASSWORD": os.getenv('DJANGO_DATABASE_PWORD'),
-        "HOST": os.getenv('DJANGO_DATABASE_HOST'),
-        "PORT": os.getenv('DATABASE_PORT'),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": 'django.db.backends.{}'.format(
+#              os.getenv('DJANGO_DATABASE_ENGINE')
+#         ),
+#         "NAME": os.getenv('DJANGO_DATABASE_NAME'),
+#         "USER": os.getenv('DJANGO_DATABASE_USER'),
+#         "PASSWORD": os.getenv('DJANGO_DATABASE_PWORD'),
+#         "HOST": os.getenv('DJANGO_DATABASE_HOST'),
+#         "PORT": os.getenv('DJANGO_DATABASE_PORT'),
+#     }
+# }
 
 DATABASES["default"] = dj_database_url.parse('postgresql://collegiate_db_user:K2Xok8QJy6mZWkthCg8T4WQuXry9uxrL@dpg-d8taq2taeets73ck0pjg-a.oregon-postgres.render.com/collegiate_db')
 
