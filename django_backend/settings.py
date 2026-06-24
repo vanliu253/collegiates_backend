@@ -159,10 +159,10 @@ AUTH_COOKIE_ACCESS = 'access'
 AUTH_COOKIE_REFRESH = 'refresh'
 AUTH_COOKIE_SECURE = True        # False only for local http dev
 AUTH_COOKIE_HTTP_ONLY = True
-AUTH_COOKIE_SAMESITE = None     # 'None' if frontend is a different domain (requires Secure=True)
+AUTH_COOKIE_SAMESITE = 'None'     # 'None' if frontend is a different domain (requires Secure=True)
 
 CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = None     # match AUTH_COOKIE_SAMESITE
+CSRF_COOKIE_SAMESITE = 'None'     # match AUTH_COOKIE_SAMESITE
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # default
 
 WSGI_APPLICATION = 'django_backend.wsgi.application'
