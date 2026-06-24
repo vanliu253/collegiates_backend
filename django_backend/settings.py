@@ -194,7 +194,7 @@ CORS_ALLOW_CREDENTIALS = True
 #     }
 # }
 
-DATABASES["default"] = dj_database_url.parse('postgresql://collegiate_db_user:K2Xok8QJy6mZWkthCg8T4WQuXry9uxrL@dpg-d8taq2taeets73ck0pjg-a.oregon-postgres.render.com/collegiate_db')
+DATABASES["default"] = dj_database_url.parse(os.getenv('RENDER_DB_URL'))
 
 # postgresql://collegiate_db_user:K2Xok8QJy6mZWkthCg8T4WQuXry9uxrL@dpg-d8taq2taeets73ck0pjg-a.oregon-postgres.render.com/collegiate_db
 

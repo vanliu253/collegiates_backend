@@ -10,5 +10,6 @@ DJANGO_LOGLEVEL=info
 DJANGO_DATABASE_ENGINE=postgresql_psycopg2
 DJANGO_CORS_ALLOWED_ORIGINS=http://localhost:8000,http://localhost:3000,https://collegiate-wushu.onrender.com
 DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://localhost:3000,https://collegiate-wushu.onrender.com
+RENDER_DB_URL=
 DEBUG=True
 PORT=8000
