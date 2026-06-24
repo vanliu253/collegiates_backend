@@ -68,8 +68,7 @@ class OrganizerSettingsView(viewsets.GenericViewSet,
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsOrganizer]
-        
-         return [permission() for permission in permission_classes]
+        return [permission() for permission in permission_classes]
 
     def get_object(self):
         return Settings.load()
