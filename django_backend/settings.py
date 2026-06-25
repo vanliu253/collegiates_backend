@@ -66,7 +66,8 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'collegiates_app.authentication.CookieJWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_RENDERER_CLASSES': [
@@ -155,7 +156,6 @@ SIMPLE_JWT = {
     "CHECK_USER_IS_ACTIVE": True,
 }
 
-AUTH_COOKIE_ACCESS = 'access'
 AUTH_COOKIE_REFRESH = 'refresh'
 AUTH_COOKIE_SECURE = True        # False only for local http dev
 AUTH_COOKIE_HTTP_ONLY = True
