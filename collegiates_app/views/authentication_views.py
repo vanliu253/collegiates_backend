@@ -19,20 +19,13 @@ def check_email(request):
     exists = User.objects.filter(email__iexact=email, user_type='C').exists()
     return Response({'exists': exists})
 
-def set_auth_cookies(response, access, refresh=None):
+def set_auth_cookies(response, refresh):
     response.set_cookie(
-        settings.AUTH_COOKIE_ACCESS, access,
+        settings.AUTH_COOKIE_REFRESH, refresh,
         httponly=settings.AUTH_COOKIE_HTTP_ONLY,
         secure=settings.AUTH_COOKIE_SECURE,
         samesite=settings.AUTH_COOKIE_SAMESITE,
     )
-    if refresh:
-        response.set_cookie(
-            settings.AUTH_COOKIE_REFRESH, refresh,
-            httponly=settings.AUTH_COOKIE_HTTP_ONLY,
-            secure=settings.AUTH_COOKIE_SECURE,
-            samesite=settings.AUTH_COOKIE_SAMESITE,
-        )
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
@@ -40,8 +33,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         if response.status_code == 200 and 'access' in response.data:
             access = response.data.pop('access')
             refresh = response.data.pop('refresh')
-            set_auth_cookies(response, access, refresh)
-            response.data = {'detail': 'logged in'}
+            set_auth_cookies(response, refresh)
+            response.data = {'access': access}
         return super().finalize_response(request, response, *args, **kwargs)
 
 
@@ -57,8 +50,8 @@ class CookieTokenRefreshView(TokenRefreshView):
         access = serializer.validated_data['access']
         new_refresh = serializer.validated_data.get('refresh')  # only if ROTATE_REFRESH_TOKENS=True
 
-        response = Response({'detail': 'refreshed'})
-        set_auth_cookies(response, access, new_refresh)
+        response = Response({'access': access})
+        set_auth_cookies(response, new_refresh)
         return response
 
 
@@ -74,10 +67,6 @@ class LogoutView(APIView):
                 pass
 
         response = Response({'detail': 'logged out'})
-        response.delete_cookie(
-            settings.AUTH_COOKIE_ACCESS,
-            samesite=settings.AUTH_COOKIE_SAMESITE,
-        )
         response.delete_cookie(
             settings.AUTH_COOKIE_REFRESH,
             samesite=settings.AUTH_COOKIE_SAMESITE,
