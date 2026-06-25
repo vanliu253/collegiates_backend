@@ -198,13 +198,13 @@ class OrganizerSerializer(serializers.ModelSerializer):
         fields = ['user_id', 'email', 'user_type']
 
 class GroupsetSerializer(serializers.ModelSerializer):
-    members = serializers.StringRelatedField(many=True)
+    members = serializers.StringRelatedField(many=True, read_only=True)
     school = serializers.StringRelatedField()
 
     class Meta:
         model = Groupset
-        fields = ['team_name', 'school', 'comp_year', 'date_created', 'members']
-        read_only_fields = ['school', 'comp_year', 'date_created', 'members']
+        fields = ['groupset_id', 'team_name', 'school', 'comp_year', 'date_created', 'members']
+        read_only_fields = ['groupset_id', 'school', 'comp_year', 'date_created', 'members']
 
     def validate(self, data):
         config = Settings.load()
