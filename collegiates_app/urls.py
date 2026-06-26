@@ -20,10 +20,11 @@ urlpatterns = [
     path('competitor/events/', CompetitorEventsView.as_view(), name="get_events"),
     path('competitor/groupset/', CompetitorCreateGroupsetView.as_view(), name="groupset"),
     path('competitor/groupset-members/', CompetitorJoinGroupsetView.as_view(), name="groupset_members"),
-    path('organizer/settings/', OrganizerSettingsView.as_view({'get': 'retrieve', 
+    path('organizer/settings/', OrganizerSettingsView.as_view({'get': 'retrieve',
                                                    'post': 'create',
-                                                   'patch': 'update'}), 
+                                                   'patch': 'update'}),
                                                    name="competition_settings"),
+    path('organizer/user/', OrganizerUserView.as_view({'post': 'create'}), name="organizer_user"),
     path('organizer/', include(router.urls))
 ]
 

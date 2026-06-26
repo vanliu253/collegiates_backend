@@ -1,15 +1,32 @@
 
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from django.core.cache import cache
 from ..permissions import IsOrganizer
 from ..models import Groupset, Settings, Blog, Registration
 from ..serializers import GroupsetSerializer, \
         SettingsSerializer, BlogSerializer, \
-        OrganizerGroupsetSerializer
+        OrganizerGroupsetSerializer, OrganizerUserSerializer
 from .competitor_views import requires_settings
 
 # ORGANIZER ENDPOINTS
+
+class OrganizerUserView(viewsets.ViewSet):
+    """
+        POST: lookup user_id by email
+    """
+
+    permission_classes = [IsOrganizer]
+    serializer_class = OrganizerUserSerializer
+
+    def create(self, request):
+        serializer = OrganizerUserSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(serializer.to_representation(None))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class OrganizerGroupsetView(viewsets.ModelViewSet):
     """
         GET: list current year groupsets
