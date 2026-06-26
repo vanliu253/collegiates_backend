@@ -289,8 +289,8 @@ class OrganizerGroupsetSerializer(serializers.ModelSerializer):
         fields = ['groupset_id', 
                   'comp_year', 
                   'date_created', 
-                  'school_name', 
                   'team_name', 
+                  'school_name', 
                   'school', 
                   'members', 
                   'leader']
@@ -304,6 +304,8 @@ class OrganizerGroupsetSerializer(serializers.ModelSerializer):
         representation['members'] = self.MemberSerializer(instance.members, many=True).data
         leader = User.objects.get(groupset_member__groupset=instance.groupset_id, groupset_member__leader=True)
         representation['leader'] = self.MemberSerializer(leader).data
+        representation['school'] = {'school_name': representation['school_name'], 'school_id': representation['school']}
+        representation.pop('school_name')
         return representation
     
     def validate(self, data):
