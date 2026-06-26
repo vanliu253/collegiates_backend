@@ -99,3 +99,5 @@ class OrganizerBlogView(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             permission_classes = [AllowAny]
         return [permissions() for permissions in permission_classes]
+
+# class OrganizerUserView(viewsets.ModelViewSet):

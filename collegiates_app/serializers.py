@@ -270,15 +270,42 @@ class SettingsSerializer(serializers.ModelSerializer):
         return data
     
 class OrganizerGroupsetSerializer(serializers.ModelSerializer):
+    
+    class MemberSerializer(serializers.ModelSerializer):
+        name = serializers.SerializerMethodField()
+        class Meta:
+            model = User
+            fields = ['user_id', 'name']
+        def get_name(self, obj):
+            return str(obj)
+
     members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), allow_null=True)
     school = serializers.PrimaryKeyRelatedField(queryset=College.objects.all())
-    leader = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True, allow_null=True)
+    school_name = serializers.StringRelatedField(source='school', read_only=True)
+    leader = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), allow_null=True)
     
     class Meta:
         model = Groupset
-        fields = ['team_name', 'school', 'comp_year', 'date_created', 'members', 'leader']
-        read_only_fields = ['comp_year', 'date_created']
+        fields = ['groupset_id', 
+                  'comp_year', 
+                  'date_created', 
+                  'school_name', 
+                  'team_name', 
+                  'school', 
+                  'members', 
+                  'leader']
+        read_only_fields = ['groupset_id', 
+                            'comp_year', 
+                            'date_created', 
+                            'school_name']
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['members'] = self.MemberSerializer(instance.members, many=True).data
+        leader = User.objects.get(groupset_member__groupset=instance.groupset_id, groupset_member__leader=True)
+        representation['leader'] = self.MemberSerializer(leader).data
+        return representation
+    
     def validate(self, data):
         config = Settings.load()
         school = data['school']
@@ -292,7 +319,7 @@ class OrganizerGroupsetSerializer(serializers.ModelSerializer):
         elif method == 'POST':
             for member in data['members']:
                 if member.is_competitor and GroupsetMember.objects.filter(member=member, groupset__comp_year=config.reg_year).exists():
-                    raise serializers.ValidationError({'groupset': 'You are already in a groupset'})
+                    raise serializers.ValidationError({'groupset': 'Member is already in a groupset'})
                 if member.school != school:
                     raise serializers.ValidationError({'groupset': 'Members must be from same school as groupset'})
             if Groupset.objects.filter(team_name=data['team_name'], comp_year=config.reg_year).exists():
