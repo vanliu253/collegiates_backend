@@ -3,7 +3,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.permissions import AllowAny
 from django.core.cache import cache
 from ..permissions import IsOrganizer
-from ..models import Groupset, Settings, Blog
+from ..models import Groupset, Settings, Blog, Registration
 from ..serializers import GroupsetSerializer, \
         SettingsSerializer, BlogSerializer, \
         OrganizerGroupsetSerializer
@@ -90,7 +90,7 @@ class OrganizerBlogView(viewsets.ModelViewSet):
         DELETE: delete blog post
     """
 
-    queryset = Blog.objects.all()
+    queryset = Blog.objects.order_by('-date_created').all()
     serializer_class = BlogSerializer
     permission_classes = [IsOrganizer]
 
@@ -100,4 +100,3 @@ class OrganizerBlogView(viewsets.ModelViewSet):
             permission_classes = [AllowAny]
         return [permissions() for permissions in permission_classes]
 
-# class OrganizerUserView(viewsets.ModelViewSet):
