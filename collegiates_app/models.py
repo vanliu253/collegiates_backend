@@ -43,11 +43,11 @@ class College(models.Model):
 
 class Event(models.Model):
     event_code = models.CharField(primary_key=True, max_length=50)
-    event_name = models.CharField(max_length=255, unique=True)
-    event_level = models.CharField(max_length=1, choices=SkillLevelChoices.choices)
-    event_category = models.CharField(max_length=1, choices=EventTypeChoices.choices)
-    gender_category = models.CharField(max_length=1, choices=GenderChoices.choices)
-    is_nandu = models.BooleanField()
+    event_name = models.CharField(max_length=255, unique=True, null=True)
+    event_level = models.CharField(max_length=1, choices=SkillLevelChoices.choices, null=True)
+    event_category = models.CharField(max_length=1, choices=EventTypeChoices.choices, null=True)
+    gender_category = models.CharField(max_length=1, choices=GenderChoices.choices, null=True)
+    is_nandu = models.BooleanField(null=True)
     
     def __str__(self):
         return self.event_name
@@ -109,7 +109,7 @@ class User(AbstractUser):
     is_competing = models.BooleanField(default=False)
     has_paid = models.BooleanField(default=False)
     proof_of_reg = models.BooleanField(default=False)
-    
+
     username = None
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['first_name', 'last_name', 'gender', 'school', 'student_type', 'first_comp', 'skill_level', 'grad_date']
@@ -132,8 +132,8 @@ class User(AbstractUser):
 
 
 class Registration(models.Model):
-    competitor = models.ForeignKey(User, on_delete=models.CASCADE, db_column='competitor_id')
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, db_column='event_code')
+    competitor = models.ForeignKey(User, on_delete=models.CASCADE, db_column='competitor_id', related_name='registration')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, db_column='event_code', related_name='registration')
     comp_year = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
     nandu_str = models.TextField(blank=True, null=True)

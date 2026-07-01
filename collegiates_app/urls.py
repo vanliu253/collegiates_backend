@@ -6,6 +6,7 @@ from .views import *
 router = DefaultRouter()
 router.register(r'blog', OrganizerBlogView, basename='blog')
 router.register(r'groupset', OrganizerGroupsetView, basename='groupset')
+router.register(r'registration', OrganizerRegistrationView, basename='registration')
 
 urlpatterns = [
     re_path(r'^auth/', include('djoser.urls')),

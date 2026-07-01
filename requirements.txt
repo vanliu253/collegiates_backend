@@ -8,3 +8,4 @@ gunicorn
 djoser
 djangorestframework-simplejwt
 dj-database-url
+django-filter

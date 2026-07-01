@@ -89,7 +89,8 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Registration
-        fields = ['comp_year', 
+        fields = ['competitor',
+                  'comp_year', 
                   'date_created',
                   'event',
                   'event_code',
@@ -104,6 +105,7 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
         for key in data['event']:
             data[key] = data['event'][key]
         data.pop("event", None)
+        data.pop("competitor")
         return data
 
     def validate(self, data):
@@ -134,21 +136,6 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
         validated_data.pop('event_code', None)
         return super().create(validated_data)
 
-class RegistrationSerializer(serializers.ModelSerializer):
-    event = EventSerializer(read_only=True)
-    
-    class Meta:
-        model = Registration
-        fields = ['event', 'comp_year', 'nandu_str']
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        if data['event']['is_nandu'] == False:
-            data.pop('nandu_str', None)
-        data['event_level'] = data['event']['event_level']
-        data['event'] = data['event']['event_name']
-        return data
-
 # serializer for creating and retrieving competitor information on frontend
 class CompetitorSerializer(serializers.ModelSerializer):
     school = serializers.PrimaryKeyRelatedField(queryset=College.objects.all())  # handles write (UUID)
@@ -176,8 +163,8 @@ class CompetitorSerializer(serializers.ModelSerializer):
                   'user_type'] # TESTING ONLY, REMOVE FOR PRODUCTION
         
     def get_registrations(self, obj):
-        registrations = obj.registration_set.all()
-        return RegistrationSerializer(registrations, many=True).data
+        registrations = obj.registration.all()
+        return EventRegistrationSerializer(registrations, many=True).data
     
     def validate(self, data):
         if data['password'] != data['re_password']:
@@ -257,7 +244,7 @@ class SettingsSerializer(serializers.ModelSerializer):
                   'contact_email',
                   'host',
                   'created_at']
-        read_only = ['created_at']
+        read_only_fields = ['created_at']
 
     def validate(self, data):
         # need to implement: dates cannot be before or after current comp year
@@ -280,7 +267,7 @@ class OrganizerGroupsetSerializer(serializers.ModelSerializer):
             return str(obj)
 
     members = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all(), allow_null=True)
-    school = serializers.PrimaryKeyRelatedField(queryset=College.objects.all())
+    school = serializers.PrimaryKeyRelatedField(queryset=College.objects.all(), allow_null=True)
     school_name = serializers.StringRelatedField(source='school', read_only=True)
     leader = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), allow_null=True)
     
@@ -340,14 +327,14 @@ class OrganizerGroupsetSerializer(serializers.ModelSerializer):
         return groupset
     
     def update(self, instance, validated_data):
-        old_members = instance.members.all()
+        old_members = list(instance.members.all())
         new_members = validated_data.pop('members', None)
         new_leader = validated_data.pop('leader', None)
         
         if instance.school != validated_data.get('school', instance.school):
             instance.school = validated_data['school']
             GroupsetMember.objects.filter(groupset=instance, member__in=old_members).delete()
-            old_members = set()
+            old_members = []
         
         instance.team_name = validated_data.get('team_name', instance.team_name)
         
@@ -369,4 +356,86 @@ class OrganizerGroupsetSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class OrganizerRegistrationSerializer(serializers.ModelSerializer):
+    class InputSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Registration
+            fields = ['event', 'nandu_str']
+    registration = EventRegistrationSerializer(many=True, read_only=True)
+    registration_input = InputSerializer(write_only=True, many=True)
+    name = serializers.StringRelatedField(source='*')
+    school = serializers.StringRelatedField()
 
+    class Meta:
+        model = User
+        fields = ['user_id',
+                  'name',
+                  'email',
+                  'gender',
+                  'skill_level',
+                  'school',
+                  'student_type',
+                  'grad_date',
+                  'first_comp',
+                  'registration',
+                  'registration_input',
+                  'is_competing', 
+                  'has_paid',
+                  'proof_of_reg']
+        read_only_fields = ['user_id',
+                     'name',
+                     'email',
+                     'gender',
+                     'skill_level',
+                     'school',
+                     'student_type',
+                     'grad_date',
+                     'first_comp',
+                     'registration']
+
+    def validate(self, data):
+        registration = data.get('registration_input', None)
+        if registration is not None:
+            events = [r['event'] for r in data['registration_input']]
+            if len(events) != len(list(set(events))):
+                raise serializers.ValidationError("No duplicate events")
+        return data
+
+    def update(self, instance, validated_data):
+        year = validated_data.pop('comp_year')
+        old_reg = list(instance.registration.filter(comp_year=year))
+        new_reg = validated_data.pop('registration_input', None)
+        
+
+        if new_reg is not None:
+            old_events = [r.event for r in old_reg]
+            new_events = [r.get('event') for r in new_reg]
+            
+            to_delete = set(old_events).difference(set(new_events))
+            to_add = set(new_events).difference(set(old_events))
+            to_update = set(new_events).intersection(set(old_events))
+
+            if to_delete:
+                Registration.objects.filter(competitor=instance, event__in=to_delete, comp_year=year).delete()
+
+            if to_add:
+                create_list = []
+                add = [r for r in new_reg if r['event'] in to_add]
+                for reg in add:
+                    create_list.append(Registration(competitor=instance, event=reg['event'], nandu_str=reg['nandu_str'], comp_year=year))
+                Registration.objects.bulk_create(create_list)
+
+            if to_update:
+                changed = False
+                update = [r for r in new_reg if r['event'] in to_update]
+                update_dict = {item['event']: item['nandu_str'] for item in update}
+                objs = Registration.objects.filter(competitor=instance, event__in=to_update, comp_year=year)
+                for obj in objs:
+                    if update_dict[obj.event] == "":
+                        continue
+                    obj.nandu_str = update_dict[obj.event]
+                    changed = True
+                if changed:
+                    Registration.objects.bulk_update(objs, ['nandu_str'])
+
+        return super().update(instance, validated_data)

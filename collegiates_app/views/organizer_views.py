@@ -3,10 +3,10 @@ from rest_framework import viewsets, mixins
 from rest_framework.permissions import AllowAny
 from django.core.cache import cache
 from ..permissions import IsOrganizer
-from ..models import Groupset, Settings, Blog, Registration
+from ..models import Groupset, Settings, Blog, Registration, User
 from ..serializers import GroupsetSerializer, \
         SettingsSerializer, BlogSerializer, \
-        OrganizerGroupsetSerializer
+        OrganizerGroupsetSerializer, OrganizerRegistrationSerializer
 from .competitor_views import requires_settings
 
 # ORGANIZER ENDPOINTS
@@ -15,13 +15,14 @@ class OrganizerGroupsetView(viewsets.ModelViewSet):
         GET: list current year groupsets
         GET(pk): get groupset
         POST: create groupset
-        PATCH/PUT: update groupset
+        PATCH: update groupset
         DELETE: delete blog post
     """
 
     queryset = Groupset.objects.prefetch_related('members')
     serializer_class = OrganizerGroupsetSerializer
     permission_classes = [IsOrganizer]
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
         if not hasattr(self, 'config'):
@@ -45,10 +46,6 @@ class OrganizerGroupsetView(viewsets.ModelViewSet):
     @requires_settings
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
-
-    @requires_settings
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
 
 class OrganizerSettingsView(viewsets.GenericViewSet, 
                           mixins.RetrieveModelMixin,
@@ -100,3 +97,38 @@ class OrganizerBlogView(viewsets.ModelViewSet):
             permission_classes = [AllowAny]
         return [permissions() for permissions in permission_classes]
 
+class OrganizerRegistrationView(viewsets.ModelViewSet):
+    """
+        GET: list all registration
+        GET(pk): retrieve registration for a user
+        PATCH: update registration
+    """
+
+    queryset = User.objects.all()
+    serializer_class = OrganizerRegistrationSerializer
+    permission_classes = [IsOrganizer]
+    http_method_names = ['get', 'patch']
+
+    def get_queryset(self):
+        if not hasattr(self, 'config'):
+            return User.objects.none()
+        return User.objects.filter(
+            registration__comp_year = self.config.reg_year
+        ).prefetch_related('registration__event').distinct()
+    
+    @requires_settings
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)    
+
+    @requires_settings
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @requires_settings
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @requires_settings
+    def perform_update(self, serializer):
+        serializer.save(comp_year=self.config.reg_year)
+    

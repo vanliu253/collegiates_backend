@@ -1,4 +1,4 @@
-from ..models import College, User, Settings, Registration, Event, Groupset, GroupsetMembers
+from ..models import College, User, Settings, Registration, Event, Groupset, GroupsetMember
 from rest_framework.test import APITestCase
 from rest_framework import status
 import uuid
