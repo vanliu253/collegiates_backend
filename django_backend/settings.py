@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -194,7 +194,7 @@ DATABASES = {
     }
 }
 
-DATABASES["default"] = dj_database_url.parse(os.getenv('RENDER_DB_URL'))
+#DATABASES["default"] = dj_database_url.parse(os.getenv('RENDER_DB_URL'))
 
 # postgresql://collegiate_db_user:K2Xok8QJy6mZWkthCg8T4WQuXry9uxrL@dpg-d8taq2taeets73ck0pjg-a.oregon-postgres.render.com/collegiate_db
 

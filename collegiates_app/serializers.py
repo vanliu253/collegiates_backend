@@ -149,6 +149,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         data['event'] = data['event']['event_name']
         return data
 
+class QuickUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['user_id',
+                  'first_name',
+                  'last_name']
+
 # serializer for creating and retrieving competitor information on frontend
 class CompetitorSerializer(serializers.ModelSerializer):
     school = serializers.PrimaryKeyRelatedField(queryset=College.objects.all())  # handles write (UUID)
@@ -196,20 +203,6 @@ class OrganizerSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['user_id', 'email', 'user_type']
-
-class OrganizerUserSerializer(serializers.Serializer):
-    email = serializers.EmailField(write_only=True)
-    user_id = serializers.UUIDField(read_only=True)
-
-    def validate_email(self, value):
-        user = User.objects.filter(email=value).first()
-        if user is None:
-            raise serializers.ValidationError("No user found with this email.")
-        self.user = user
-        return value
-
-    def to_representation(self, _):
-        return {'user_id': str(self.user.user_id)}
 
 class GroupsetSerializer(serializers.ModelSerializer):
     members = serializers.StringRelatedField(many=True, read_only=True)

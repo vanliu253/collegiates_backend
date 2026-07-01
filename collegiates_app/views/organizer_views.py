@@ -4,27 +4,29 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.core.cache import cache
 from ..permissions import IsOrganizer
-from ..models import Groupset, Settings, Blog, Registration
+from ..models import Groupset, Settings, Blog, Registration, User
 from ..serializers import GroupsetSerializer, \
         SettingsSerializer, BlogSerializer, \
-        OrganizerGroupsetSerializer, OrganizerUserSerializer
+        OrganizerGroupsetSerializer, QuickUserSerializer
 from .competitor_views import requires_settings
 
 # ORGANIZER ENDPOINTS
 
-class OrganizerUserView(viewsets.ViewSet):
+class OrganizerUserView(viewsets.ModelViewSet):
     """
-        POST: lookup user_id by email
+        GET: lookup user_id by email
     """
 
+    queryset = User.objects
     permission_classes = [IsOrganizer]
-    serializer_class = OrganizerUserSerializer
+    serializer_class = QuickUserSerializer
 
-    def create(self, request):
-        serializer = OrganizerUserSerializer(data=request.data)
-        if serializer.is_valid():
-            return Response(serializer.to_representation(None))
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def retrieve(self, _, email=None):
+        user = User.objects.filter(email=email).first()
+        serializer = self.serializer_class(user)
+        if user is None:
+            return Response({'detail': 'No user found with this email.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'data': serializer.data})
 
 
 class OrganizerGroupsetView(viewsets.ModelViewSet):

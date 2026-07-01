@@ -24,7 +24,7 @@ urlpatterns = [
                                                    'post': 'create',
                                                    'patch': 'update'}),
                                                    name="competition_settings"),
-    path('organizer/user/', OrganizerUserView.as_view({'post': 'create'}), name="organizer_user"),
+    path('organizer/user/<str:email>/', OrganizerUserView.as_view({'get': 'retrieve'}), name="organizer_user"),
     path('organizer/', include(router.urls))
 ]
 
