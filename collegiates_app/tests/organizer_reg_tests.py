@@ -65,6 +65,8 @@ class OrganizerRegistrationTestBase(APITestCase):
             reg_end="2025-12-31",
             contact_email="contact@example.com",
             host=cls.college,
+            reg_cost_first=50,
+            reg_cost_extra=20
         )
 
         cls.organizer = User.objects.create(
@@ -171,6 +173,8 @@ class RequiresSettingsTests(OrganizerRegistrationTestBase):
             reg_end="2026-12-31",
             contact_email="contact2026@example.com",
             host=self.college,
+            reg_cost_first=50,
+            reg_cost_extra=20
         )
         cache.clear()
         self.assertEqual(Settings.load().reg_year, newer.reg_year)

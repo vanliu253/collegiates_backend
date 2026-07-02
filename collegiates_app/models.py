@@ -186,9 +186,12 @@ CACHE_KEY = "competition_settings_latest"
 class Settings(models.Model):
     reg_year = models.IntegerField()
     early_reg_start = models.DateField(blank=True, null=True)
-    early_reg_end = models.DateField(blank=True, null=True)
+    early_reg_cost_first = models.IntegerField(blank=True, null=True)
+    early_reg_cost_extra = models.IntegerField(blank=True, null=True)
     reg_start = models.DateField()
     reg_end = models.DateField()
+    reg_cost_first = models.IntegerField()
+    reg_cost_extra = models.IntegerField()
     comp_date = models.DateField(blank=True, null=True)
     contact_email = models.EmailField()
     host = models.ForeignKey(College, on_delete=models.CASCADE, db_column='school_id')
@@ -205,8 +208,8 @@ class Settings(models.Model):
     @property
     def reg_active(self):
         now = timezone.now()
-        if self.early_reg_start and self.early_reg_end:
-            if self.early_reg_start <= now <= self.early_reg_end:
+        if self.early_reg_start:
+            if self.early_reg_start <= now <= self.reg_start:
                 return True
         elif self.reg_start <= now <= self.reg_end:
             return True
